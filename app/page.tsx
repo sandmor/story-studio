@@ -146,8 +146,6 @@ export default function Home() {
           onEventCreate={handleEventCreate}
           onEventUpdate={handleEventUpdate}
           onEventDelete={handleEventDelete}
-          viewStartTime={0}
-          viewEndTime={15}
         />
       </div>
     </div>
