@@ -1,103 +1,155 @@
-import Image from "next/image";
+"use client";
+
+import { CharacterPanel } from "@/components/character-panel";
+import { DEFAULT_COLORS } from "@/components/color-picker";
+import { TimelineView } from "@/components/timeline/timeline-view";
+import { Character, TimelineEvent } from "@/types/timeline";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [characters, setCharacters] = useState<Character[]>([
+    {
+      id: "1",
+      name: "Alice",
+      color: "#3B82F6",
+      visible: true,
+      order: 1,
+    },
+    {
+      id: "2",
+      name: "Bob",
+      color: "#EF4444",
+      visible: true,
+      order: 2,
+    },
+    {
+      id: "3",
+      name: "Charlie",
+      color: "#10B981",
+      visible: true,
+      order: 3,
+    },
+  ]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const [events, setEvents] = useState<TimelineEvent[]>([
+    {
+      id: "1",
+      title: "Meeting at Cafe",
+      description: "Alice and Bob meet for coffee",
+      startTime: 1,
+      endTime: 3,
+      characterIds: ["1", "2"],
+      color: DEFAULT_COLORS[0],
+    },
+    {
+      id: "2",
+      title: "Solo Journey",
+      description: "Charlie travels alone",
+      startTime: 2,
+      endTime: 5,
+      characterIds: ["3"],
+      color: DEFAULT_COLORS[2],
+    },
+    {
+      id: "3",
+      title: "Group Adventure",
+      description: "All three embark on an adventure",
+      startTime: 6,
+      endTime: 10,
+      characterIds: ["1", "2", "3"],
+      color: DEFAULT_COLORS[1],
+    },
+  ]);
+
+  const handleCharacterCreate = (characterData: Omit<Character, "id">) => {
+    const newCharacter: Character = {
+      ...characterData,
+      id: Date.now().toString(),
+    };
+    setCharacters((prev) => [...prev, newCharacter]);
+    toast.success(`Character "${newCharacter.name}" created!`);
+  };
+
+  const handleCharacterUpdate = (updatedCharacter: Character) => {
+    setCharacters((prev) =>
+      prev.map((char) =>
+        char.id === updatedCharacter.id ? updatedCharacter : char
+      )
+    );
+    toast.success(`Character "${updatedCharacter.name}" updated!`);
+  };
+
+  const handleCharacterDelete = (characterId: string) => {
+    const character = characters.find((c) => c.id === characterId);
+    if (!character) return;
+
+    // Remove character from events
+    setEvents((prev) =>
+      prev
+        .map((event) => ({
+          ...event,
+          characterIds: event.characterIds.filter((id) => id !== characterId),
+        }))
+        .filter((event) => event.characterIds.length > 0)
+    );
+
+    setCharacters((prev) => prev.filter((char) => char.id !== characterId));
+    toast.success(`Character "${character.name}" deleted!`);
+  };
+
+  const handleCharacterReorder = (reorderedCharacters: Character[]) => {
+    setCharacters(reorderedCharacters);
+  };
+
+  const handleEventCreate = (eventData: Omit<TimelineEvent, "id">) => {
+    const newEvent: TimelineEvent = {
+      ...eventData,
+      id: Date.now().toString(),
+    };
+    setEvents((prev) => [...prev, newEvent]);
+    toast.success(`Event "${newEvent.title}" created!`);
+  };
+
+  const handleEventUpdate = (updatedEvent: TimelineEvent) => {
+    setEvents((prev) =>
+      prev.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
+    );
+    toast.success(`Event "${updatedEvent.title}" updated!`);
+  };
+
+  const handleEventDelete = (eventId: string) => {
+    const event = events.find((e) => e.id === eventId);
+    setEvents((prev) => prev.filter((event) => event.id !== eventId));
+    if (event) {
+      toast.success(`Event "${event.title}" deleted!`);
+    }
+  };
+
+  return (
+    <div className="h-screen flex bg-gradient-to-br from-background via-background to-secondary/10">
+      {/* Character Management Panel */}
+      <CharacterPanel
+        characters={characters}
+        onCharacterCreate={handleCharacterCreate}
+        onCharacterUpdate={handleCharacterUpdate}
+        onCharacterDelete={handleCharacterDelete}
+        onCharacterReorder={handleCharacterReorder}
+      />
+
+      {/* Timeline View */}
+      <div className="flex-1 flex flex-col">
+        <TimelineView
+          characters={characters}
+          events={events}
+          onCharacterUpdate={handleCharacterUpdate}
+          onEventCreate={handleEventCreate}
+          onEventUpdate={handleEventUpdate}
+          onEventDelete={handleEventDelete}
+          viewStartTime={0}
+          viewEndTime={15}
+        />
+      </div>
     </div>
   );
 }
