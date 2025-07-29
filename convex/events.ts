@@ -1,9 +1,21 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { getUserId } from "./utils";
 
 export const list = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("timeline_events").collect();
+  args: {
+    projectId: v.id("projects"),
+  },
+  handler: async (ctx, { projectId }) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      return [];
+    }
+
+    return await ctx.db
+      .query("timeline_events")
+      .withIndex("by_project_id", (q) => q.eq("projectId", projectId))
+      .collect();
   },
 });
 
@@ -15,8 +27,14 @@ export const create = mutation({
     endTime: v.number(),
     participants: v.array(v.id("characters")),
     color: v.string(),
+    projectId: v.id("projects"),
   },
   handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
     const eventId = await ctx.db.insert("timeline_events", args);
     return eventId;
   },
@@ -33,6 +51,10 @@ export const update = mutation({
     color: v.optional(v.string()),
   },
   handler: async (ctx, { id, ...rest }) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
     await ctx.db.patch(id, rest);
   },
 });
@@ -40,6 +62,10 @@ export const update = mutation({
 export const deleteEvent = mutation({
   args: { id: v.id("timeline_events") },
   handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
     await ctx.db.delete(args.id);
   },
 });

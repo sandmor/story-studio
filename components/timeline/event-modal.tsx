@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Type, Text, Clock, Palette, Users } from "lucide-react";
 import { ColorPicker, DEFAULT_COLORS } from "@/components/color-picker";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface EventModalProps {
   event: TimelineEvent | null;
@@ -25,6 +26,7 @@ interface EventModalProps {
   onSave: (event: TimelineEventInput) => void;
   onClose: () => void;
   onDelete?: () => void;
+  projectId: Id<"projects">;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -33,6 +35,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   onSave,
   onClose,
   onDelete,
+  projectId,
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -71,6 +74,7 @@ export const EventModal: React.FC<EventModalProps> = ({
       endTime: Math.max(endTime, startTime + 0.1),
       participants: selectedCharacterIds,
       color: color,
+      projectId,
     });
   };
 
