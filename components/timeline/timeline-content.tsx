@@ -15,11 +15,6 @@ interface TimelineContentProps {
   rightPanelRef: React.RefObject<HTMLDivElement | null>;
   rightHeaderRef: React.RefObject<HTMLDivElement | null>;
   onEventClick: (event: TimelineEvent) => void;
-  onEventMove: (
-    eventId: string,
-    newStartTime: number,
-    newEndTime: number
-  ) => void;
   onHorizontalScroll: () => void;
 }
 
@@ -34,7 +29,6 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
   rightPanelRef,
   rightHeaderRef,
   onEventClick,
-  onEventMove,
   onHorizontalScroll,
 }) => {
   const visibleCharacters = characters
@@ -93,7 +87,6 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
                 viewStartTime={viewStartTime}
                 isSelected={selectedEventId === event._id}
                 onClick={onEventClick}
-                onMove={onEventMove}
               />
             ))}
           </div>

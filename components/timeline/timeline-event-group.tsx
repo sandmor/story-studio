@@ -9,7 +9,6 @@ interface TimelineEventGroupProps {
   viewStartTime: number;
   isSelected: boolean;
   onClick: (event: TimelineEvent) => void;
-  onMove: (eventId: string, newStartTime: number, newEndTime: number) => void;
 }
 
 const groupAdjacentNumbers = (numbers: number[]): number[][] => {
@@ -41,7 +40,6 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
   viewStartTime,
   isSelected,
   onClick,
-  onMove,
 }) => {
   const characterIndexMap = new Map(
     visibleCharacters.map((char, index) => [char._id, index])
@@ -75,7 +73,6 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
             viewStartTime={viewStartTime}
             isSelected={isSelected}
             onClick={() => onClick(event)}
-            onMove={onMove}
             top={top}
             height={height}
             isMultiCharacter={event.participants.length > 1}

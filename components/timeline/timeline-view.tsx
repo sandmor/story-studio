@@ -63,20 +63,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     [editingEvent, onEventUpdate, onEventCreate, closeModal]
   );
 
-  const handleEventMove = useCallback(
-    (eventId: string, newStartTime: number, newEndTime: number) => {
-      const originalEvent = events.find((e) => e._id === eventId);
-      if (originalEvent) {
-        onEventUpdate({
-          ...originalEvent,
-          startTime: newStartTime,
-          endTime: newEndTime,
-        });
-      }
-    },
-    [events, onEventUpdate]
-  );
-
   const handleHorizontalScroll = useCallback(() => {
     if (rightHeaderRef.current && rightPanelRef.current) {
       rightHeaderRef.current.scrollLeft = rightPanelRef.current.scrollLeft;
@@ -111,7 +97,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           rightPanelRef={rightPanelRef}
           rightHeaderRef={rightHeaderRef}
           onEventClick={handleEventClick}
-          onEventMove={handleEventMove}
           onHorizontalScroll={handleHorizontalScroll}
         />
       </div>
