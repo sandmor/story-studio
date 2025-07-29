@@ -22,7 +22,7 @@ export const CharacterSidebar: React.FC<CharacterSidebarProps> = ({
       <div ref={leftPanelRef} className="flex-1 overflow-y-auto">
         {visibleCharacters.map((character) => (
           <div
-            key={character.id}
+            key={character._id}
             className="h-20 border-b border-timeline-grid flex items-center px-4 bg-timeline-track hover:bg-timeline-track-alt transition-colors"
           >
             <div className="flex items-center gap-3">

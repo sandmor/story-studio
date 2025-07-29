@@ -1,129 +1,79 @@
 "use client";
 
+import { api } from "@/convex/_generated/api";
 import { CharacterPanel } from "@/components/character-panel";
-import { DEFAULT_COLORS } from "@/components/color-picker";
 import { TimelineView } from "@/components/timeline/timeline-view";
-import { Character, TimelineEvent } from "@/types/timeline";
-import { useState } from "react";
+import {
+  Character,
+  TimelineEvent,
+  CharacterInput,
+  TimelineEventInput,
+} from "@/types/timeline";
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 
 export default function Home() {
-  const [characters, setCharacters] = useState<Character[]>([
-    {
-      id: "1",
-      name: "Alice",
-      color: "#3B82F6",
-      visible: true,
-      order: 1,
-    },
-    {
-      id: "2",
-      name: "Bob",
-      color: "#EF4444",
-      visible: true,
-      order: 2,
-    },
-    {
-      id: "3",
-      name: "Charlie",
-      color: "#10B981",
-      visible: true,
-      order: 3,
-    },
-  ]);
+  const characters = useQuery(api.characters.get) || [];
+  const events = useQuery(api.events.list) || [];
 
-  const [events, setEvents] = useState<TimelineEvent[]>([
-    {
-      id: "1",
-      title: "Meeting at Cafe",
-      description: "Alice and Bob meet for coffee",
-      startTime: 1,
-      endTime: 3,
-      characterIds: ["1", "2"],
-      color: DEFAULT_COLORS[0],
-    },
-    {
-      id: "2",
-      title: "Solo Journey",
-      description: "Charlie travels alone",
-      startTime: 2,
-      endTime: 5,
-      characterIds: ["3"],
-      color: DEFAULT_COLORS[2],
-    },
-    {
-      id: "3",
-      title: "Group Adventure",
-      description: "All three embark on an adventure",
-      startTime: 6,
-      endTime: 10,
-      characterIds: ["1", "2", "3"],
-      color: DEFAULT_COLORS[1],
-    },
-  ]);
+  const createCharacter = useMutation(api.characters.create);
+  const updateCharacter = useMutation(api.characters.update);
+  const deleteCharacter = useMutation(api.characters.deleteCharacter);
+  const reorderCharacters = useMutation(api.characters.reorder);
 
-  const handleCharacterCreate = (characterData: Omit<Character, "id">) => {
-    const newCharacter: Character = {
-      ...characterData,
-      id: Date.now().toString(),
-    };
-    setCharacters((prev) => [...prev, newCharacter]);
-    toast.success(`Character "${newCharacter.name}" created!`);
+  const createEvent = useMutation(api.events.create);
+  const updateEvent = useMutation(api.events.update);
+  const deleteEvent = useMutation(api.events.deleteEvent);
+
+  const handleCharacterCreate = (characterData: CharacterInput) => {
+    createCharacter(characterData).then(() => {
+      toast.success(`Character "${characterData.name}" created!`);
+    });
   };
 
   const handleCharacterUpdate = (updatedCharacter: Character) => {
-    setCharacters((prev) =>
-      prev.map((char) =>
-        char.id === updatedCharacter.id ? updatedCharacter : char
-      )
-    );
-    toast.success(`Character "${updatedCharacter.name}" updated!`);
+    const { _id, _creationTime, ...rest } = updatedCharacter;
+    updateCharacter({ id: _id, ...rest }).then(() => {
+      toast.success(`Character "${updatedCharacter.name}" updated!`);
+    });
   };
 
   const handleCharacterDelete = (characterId: string) => {
-    const character = characters.find((c) => c.id === characterId);
+    const character = characters.find((c) => c._id === characterId);
     if (!character) return;
-
-    // Remove character from events
-    setEvents((prev) =>
-      prev
-        .map((event) => ({
-          ...event,
-          characterIds: event.characterIds.filter((id) => id !== characterId),
-        }))
-        .filter((event) => event.characterIds.length > 0)
-    );
-
-    setCharacters((prev) => prev.filter((char) => char.id !== characterId));
-    toast.success(`Character "${character.name}" deleted!`);
+    deleteCharacter({ id: character._id }).then(() => {
+      toast.success(`Character "${character.name}" deleted!`);
+    });
   };
 
   const handleCharacterReorder = (reorderedCharacters: Character[]) => {
-    setCharacters(reorderedCharacters);
+    reorderCharacters({
+      reorderedCharacters: reorderedCharacters.map(({ _id, order }) => ({
+        _id,
+        order,
+      })),
+    });
   };
 
-  const handleEventCreate = (eventData: Omit<TimelineEvent, "id">) => {
-    const newEvent: TimelineEvent = {
-      ...eventData,
-      id: Date.now().toString(),
-    };
-    setEvents((prev) => [...prev, newEvent]);
-    toast.success(`Event "${newEvent.title}" created!`);
+  const handleEventCreate = (eventData: TimelineEventInput) => {
+    createEvent(eventData).then(() => {
+      toast.success(`Event "${eventData.title}" created!`);
+    });
   };
 
   const handleEventUpdate = (updatedEvent: TimelineEvent) => {
-    setEvents((prev) =>
-      prev.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
-    );
-    toast.success(`Event "${updatedEvent.title}" updated!`);
+    const { _id, _creationTime, ...rest } = updatedEvent;
+    updateEvent({ id: _id, ...rest }).then(() => {
+      toast.success(`Event "${updatedEvent.title}" updated!`);
+    });
   };
 
   const handleEventDelete = (eventId: string) => {
-    const event = events.find((e) => e.id === eventId);
-    setEvents((prev) => prev.filter((event) => event.id !== eventId));
-    if (event) {
+    const event = events.find((e) => e._id === eventId);
+    if (!event) return;
+    deleteEvent({ id: event._id }).then(() => {
       toast.success(`Event "${event.title}" deleted!`);
-    }
+    });
   };
 
   return (

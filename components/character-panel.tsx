@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Character } from "@/types/timeline";
+import { Character, CharacterInput } from "@/types/timeline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,7 +14,7 @@ import { ColorPicker, DEFAULT_COLORS } from "@/components/color-picker";
 
 interface CharacterPanelProps {
   characters: Character[];
-  onCharacterCreate: (character: Omit<Character, "id">) => void;
+  onCharacterCreate: (character: CharacterInput) => void;
   onCharacterUpdate: (character: Character) => void;
   onCharacterDelete: (characterId: string) => void;
   onCharacterReorder: (characters: Character[]) => void;
@@ -106,7 +106,7 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
       <div className="flex-1 overflow-auto p-2 space-y-2">
         {sortedCharacters.map((character) => (
           <div
-            key={character.id}
+            key={character._id}
             className={`p-3 rounded-lg border transition-all ${
               character.visible
                 ? "bg-background border-border"
@@ -149,7 +149,7 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onCharacterDelete(character.id)}
+                  onClick={() => onCharacterDelete(character._id)}
                   className="w-8 h-8 p-0 text-destructive hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4" />

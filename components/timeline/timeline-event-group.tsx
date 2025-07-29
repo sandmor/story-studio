@@ -44,10 +44,10 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
   onMove,
 }) => {
   const characterIndexMap = new Map(
-    visibleCharacters.map((char, index) => [char.id, index])
+    visibleCharacters.map((char, index) => [char._id, index])
   );
 
-  const trackIndices = event.characterIds
+  const trackIndices = event.participants
     .map((id) => characterIndexMap.get(id))
     .filter((index): index is number => index !== undefined);
 
@@ -69,7 +69,7 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
 
         return (
           <TimelineEventComponent
-            key={`${event.id}-${index}`}
+            key={`${event._id}-${index}`}
             event={event}
             pixelsPerTimeUnit={pixelsPerTimeUnit}
             viewStartTime={viewStartTime}
@@ -78,7 +78,7 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
             onMove={onMove}
             top={top}
             height={height}
-            isMultiCharacter={event.characterIds.length > 1}
+            isMultiCharacter={event.participants.length > 1}
           />
         );
       })}

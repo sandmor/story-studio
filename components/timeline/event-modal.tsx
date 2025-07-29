@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { TimelineEvent, Character } from "@/types/timeline";
+import {
+  TimelineEvent,
+  Character,
+  CharacterId,
+  TimelineEventInput,
+} from "@/types/timeline";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +22,7 @@ import { ColorPicker, DEFAULT_COLORS } from "@/components/color-picker";
 interface EventModalProps {
   event: TimelineEvent | null;
   characters: Character[];
-  onSave: (event: Omit<TimelineEvent, "id">) => void;
+  onSave: (event: TimelineEventInput) => void;
   onClose: () => void;
   onDelete?: () => void;
 }
@@ -33,9 +38,9 @@ export const EventModal: React.FC<EventModalProps> = ({
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(1);
-  const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>(
-    []
-  );
+  const [selectedCharacterIds, setSelectedCharacterIds] = useState<
+    CharacterId[]
+  >([]);
   const [color, setColor] = useState(DEFAULT_COLORS[2]);
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export const EventModal: React.FC<EventModalProps> = ({
       setDescription(event.description || "");
       setStartTime(event.startTime);
       setEndTime(event.endTime);
-      setSelectedCharacterIds(event.characterIds);
+      setSelectedCharacterIds(event.participants);
       setColor(event.color);
     } else {
       setTitle("");
@@ -64,12 +69,12 @@ export const EventModal: React.FC<EventModalProps> = ({
       description: description.trim(),
       startTime,
       endTime: Math.max(endTime, startTime + 0.1),
-      characterIds: selectedCharacterIds,
+      participants: selectedCharacterIds,
       color: color,
     });
   };
 
-  const handleCharacterToggle = (characterId: string) => {
+  const handleCharacterToggle = (characterId: CharacterId) => {
     setSelectedCharacterIds((prev) =>
       prev.includes(characterId)
         ? prev.filter((id) => id !== characterId)
@@ -157,18 +162,18 @@ export const EventModal: React.FC<EventModalProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 {characters.map((character) => (
                   <div
-                    key={character.id}
+                    key={character._id}
                     className="flex items-center space-x-2 p-1 rounded-md hover:bg-accent"
                   >
                     <Checkbox
-                      id={`char-${character.id}`}
-                      checked={selectedCharacterIds.includes(character.id)}
+                      id={`char-${character._id}`}
+                      checked={selectedCharacterIds.includes(character._id)}
                       onCheckedChange={() =>
-                        handleCharacterToggle(character.id)
+                        handleCharacterToggle(character._id)
                       }
                     />
                     <Label
-                      htmlFor={`char-${character.id}`}
+                      htmlFor={`char-${character._id}`}
                       className="flex items-center gap-2 text-sm font-normal cursor-pointer"
                     >
                       <div

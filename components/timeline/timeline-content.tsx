@@ -77,7 +77,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
 
           {visibleCharacters.map((character, index) => (
             <CharacterTrack
-              key={character.id}
+              key={character._id}
               character={character}
               trackIndex={index}
             />
@@ -86,12 +86,12 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
           <div className="absolute top-0 left-0 h-full w-full pointer-events-none">
             {events.map((event) => (
               <TimelineEventGroup
-                key={event.id}
+                key={event._id}
                 event={event}
                 visibleCharacters={visibleCharacters}
                 pixelsPerTimeUnit={pixelsPerTimeUnit}
                 viewStartTime={viewStartTime}
-                isSelected={selectedEventId === event.id}
+                isSelected={selectedEventId === event._id}
                 onClick={onEventClick}
                 onMove={onEventMove}
               />

@@ -1,21 +1,17 @@
-export interface Character {
-  id: string;
-  name: string;
-  color: string;
-  visible: boolean;
-  order: number;
-}
+import type { Doc, Id } from "@/convex/_generated/dataModel";
 
-export interface TimelineEvent {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: number; // Custom time unit
-  endTime: number;
-  characterIds: string[]; // Array of character IDs involved
-  color: string;
-}
+export type Character = Doc<"characters">;
+export type TimelineEvent = Doc<"timeline_events">;
 
+// Type aliases
+export type CharacterId = Id<"characters">;
+export type TimelineEventId = Id<"timeline_events">;
+
+// Clean input types for creating new entities (without Convex metadata)
+export type CharacterInput = Omit<Character, "_id" | "_creationTime">;
+export type TimelineEventInput = Omit<TimelineEvent, "_id" | "_creationTime">;
+
+// State management types
 export interface TimelineState {
   characters: Character[];
   events: TimelineEvent[];

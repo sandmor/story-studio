@@ -124,7 +124,7 @@ export const TimelineEventComponent: React.FC<TimelineEventComponentProps> = ({
   const handleMouseUp = useCallback(() => {
     if ((isDragging || isResizing) && wasMoved.current && finalTimes.current) {
       onMove(
-        event.id,
+        event._id,
         finalTimes.current.startTime,
         finalTimes.current.endTime
       );
@@ -132,7 +132,7 @@ export const TimelineEventComponent: React.FC<TimelineEventComponentProps> = ({
     setIsDragging(false);
     setIsResizing(null);
     finalTimes.current = null;
-  }, [isDragging, isResizing, onMove, event.id]);
+  }, [isDragging, isResizing, onMove, event._id]);
 
   React.useEffect(() => {
     if (isDragging || isResizing) {

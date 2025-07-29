@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { Character, TimelineEvent } from "@/types/timeline";
+import { Character, TimelineEvent, TimelineEventInput } from "@/types/timeline";
 import { EventModal } from "./event-modal";
 import { TimelineHeaderBar } from "./timeline-header-bar";
 import { CharacterSidebar } from "./character-sidebar";
@@ -13,7 +13,7 @@ interface TimelineViewProps {
   events: TimelineEvent[];
   onCharacterUpdate: (character: Character) => void;
   onEventUpdate: (event: TimelineEvent) => void;
-  onEventCreate: (event: Omit<TimelineEvent, "id">) => void;
+  onEventCreate: (event: TimelineEventInput) => void;
   onEventDelete: (eventId: string) => void;
 }
 
@@ -48,9 +48,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   // Event handlers
   const handleEventSave = useCallback(
-    (eventData: Omit<TimelineEvent, "id">) => {
+    (eventData: TimelineEventInput) => {
       if (editingEvent) {
-        onEventUpdate({ ...eventData, id: editingEvent.id });
+        onEventUpdate({
+          ...eventData,
+          _id: editingEvent._id,
+          _creationTime: editingEvent._creationTime,
+        });
       } else {
         onEventCreate(eventData);
       }
@@ -61,7 +65,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   const handleEventMove = useCallback(
     (eventId: string, newStartTime: number, newEndTime: number) => {
-      const originalEvent = events.find((e) => e.id === eventId);
+      const originalEvent = events.find((e) => e._id === eventId);
       if (originalEvent) {
         onEventUpdate({
           ...originalEvent,
@@ -81,7 +85,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   const handleEventDelete = useCallback(() => {
     if (editingEvent) {
-      onEventDelete(editingEvent.id);
+      onEventDelete(editingEvent._id);
       closeModal();
     }
   }, [editingEvent, onEventDelete, closeModal]);

@@ -7,7 +7,7 @@ export const useEventModal = () => {
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
 
   const handleEventClick = useCallback((event: TimelineEvent) => {
-    setSelectedEventId(event.id);
+    setSelectedEventId(event._id);
     setEditingEvent(event);
     setShowEventModal(true);
   }, []);
