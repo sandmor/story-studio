@@ -4,6 +4,7 @@ import { usePreloadedQuery, useMutation, Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { CharacterPanel } from "@/components/character-panel";
 import { TimelineView } from "@/components/timeline/timeline-view";
+import { SpreadsheetView } from "@/components/spreadsheet/spreadsheet-view";
 import {
   Character,
   TimelineEvent,
@@ -13,6 +14,8 @@ import {
 import { toast } from "sonner";
 import { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
+import { useViewStore } from "@/stores/use-view-store";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProjectClientPage({
   preloadedCharacters,
@@ -26,6 +29,8 @@ export default function ProjectClientPage({
 
   const characters = usePreloadedQuery(preloadedCharacters) || [];
   const events = usePreloadedQuery(preloadedEvents) || [];
+
+  const { view, setView } = useViewStore();
 
   const createCharacter = useMutation(api.characters.create);
   const updateCharacter = useMutation(api.characters.update);
@@ -97,15 +102,30 @@ export default function ProjectClientPage({
         onCharacterReorder={handleCharacterReorder}
       />
       <div className="flex-1 flex flex-col">
-        <TimelineView
-          characters={characters}
-          events={events}
-          onCharacterUpdate={handleCharacterUpdate}
-          onEventCreate={handleEventCreate}
-          onEventUpdate={handleEventUpdate}
-          onEventDelete={handleEventDelete}
-          projectId={projectId}
-        />
+        <Tabs value={view} onValueChange={(value) => setView(value as "timeline" | "spreadsheet")} className="h-full flex flex-col">
+          <TabsList className="mx-4 mt-4 self-start">
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="spreadsheet">Spreadsheet</TabsTrigger>
+          </TabsList>
+          <TabsContent value="timeline" className="flex-1">
+            <TimelineView
+              characters={characters}
+              events={events}
+              onCharacterUpdate={handleCharacterUpdate}
+              onEventCreate={handleEventCreate}
+              onEventUpdate={handleEventUpdate}
+              onEventDelete={handleEventDelete}
+              projectId={projectId}
+            />
+          </TabsContent>
+          <TabsContent value="spreadsheet" className="flex-1">
+            <SpreadsheetView
+              events={events}
+              characters={characters}
+              onEventUpdate={handleEventUpdate}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
