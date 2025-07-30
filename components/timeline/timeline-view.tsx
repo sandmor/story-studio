@@ -6,6 +6,7 @@ import { TimelineContent } from "./timeline-content";
 import { useTimelineViewport } from "@/hooks/use-timeline-viewport";
 import { useSyncScrolls } from "@/hooks/use-sync-scrolls";
 import { Id } from "@/convex/_generated/dataModel";
+import { useEventModalStore } from "@/stores/use-event-modal-store";
 
 interface TimelineViewProps {
   characters: Character[];
@@ -23,20 +24,6 @@ interface TimelineViewProps {
   onEventCreate: (event: TimelineEventInput) => void;
   onEventDelete: (eventId: string) => void;
   projectId: Id<"projects">;
-  showEventModal: boolean;
-  editingEvent:
-    | (Omit<TimelineEvent, "startTime" | "endTime"> & {
-        startTime: number;
-        endTime: number;
-      })
-    | null;
-  onEventClick: (
-    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
-      startTime: number;
-      endTime: number;
-    }
-  ) => void;
-  closeModal: () => void;
 }
 
 export const TimelineView: React.FC<TimelineViewProps> = ({
@@ -47,14 +34,12 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onEventCreate,
   onEventDelete,
   projectId,
-  showEventModal,
-  editingEvent,
-  onEventClick,
-  closeModal,
 }) => {
   // Custom hooks for state management
   const { pixelsPerTimeUnit, viewStartTime, viewEndTime, viewportRef } =
     useTimelineViewport();
+
+  const { isOpen, editingEvent, openModal, closeModal } = useEventModalStore();
 
   // Refs for scroll synchronization
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -110,14 +95,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           viewportRef={viewportRef}
           rightPanelRef={rightPanelRef}
           rightHeaderRef={rightHeaderRef}
-          onEventClick={onEventClick}
           onHorizontalScroll={handleHorizontalScroll}
         />
       </div>
 
       {/* Event Modal */}
       <EventModal
-        isOpen={showEventModal}
+        isOpen={isOpen}
         event={editingEvent}
         characters={characters}
         onSave={handleEventSave}

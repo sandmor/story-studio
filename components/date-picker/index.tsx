@@ -29,10 +29,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
     const newDate = { ...date, [field]: newValue };
 
     if (field === "year" || field === "month") {
-        const daysInMonth = getDaysInMonth(newDate.year, newDate.month - 1);
-        if (newDate.day > daysInMonth) {
-            newDate.day = daysInMonth;
-        }
+      const daysInMonth = getDaysInMonth(newDate.year, newDate.month - 1);
+      if (newDate.day > daysInMonth) {
+        newDate.day = daysInMonth;
+      }
     }
 
     setDate(newDate);
@@ -43,18 +43,12 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
     year: number;
     month: number;
     day: number;
-    hour: number;
-    minute: number;
-    second: number;
   }) => {
-    const { year, month, day, hour, minute, second } = date;
+    const { year, month, day } = date;
     return `${String(day).padStart(2, "0")}/${String(month).padStart(
       2,
       "0"
-    )}/${year} ${String(hour).padStart(2, "0")}:${String(minute).padStart(
-      2,
-      "0"
-    )}:${String(second).padStart(2, "0")}`;
+    )}/${year}`;
   };
 
   return (
@@ -93,7 +87,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2">
           <div className="space-y-2">
             <label className="text-sm font-medium">Day</label>
             <Input
@@ -102,42 +96,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
               max={getDaysInMonth(date.year, date.month - 1)}
               value={date.day}
               onChange={(e) => handleDateChange("day", parseInt(e.target.value))}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Hour</label>
-            <Input
-              type="number"
-              min={0}
-              max={23}
-              value={date.hour}
-              onChange={(e) => handleDateChange("hour", parseInt(e.target.value))}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Minute</label>
-            <Input
-              type="number"
-              min={0}
-              max={59}
-              value={date.minute}
-              onChange={(e) =>
-                handleDateChange("minute", parseInt(e.target.value))
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Second</label>
-            <Input
-              type="number"
-              min={0}
-              max={59}
-              value={date.second}
-              onChange={(e) =>
-                handleDateChange("second", parseInt(e.target.value))
-              }
             />
           </div>
         </div>

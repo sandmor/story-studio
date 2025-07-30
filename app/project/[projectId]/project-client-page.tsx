@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus, Settings } from "lucide-react";
 import Link from "next/link";
-import { useEventModal } from "@/hooks/use-event-modal";
+import { useEventModalStore } from "@/stores/use-event-modal-store";
 
 export default function ProjectClientPage({
   preloadedCharacters,
@@ -39,13 +39,7 @@ export default function ProjectClientPage({
   }));
 
   const { view, setView } = useViewStore();
-  const {
-    showEventModal,
-    editingEvent,
-    handleEventClick,
-    handleCreateEvent: openEventModal,
-    closeModal,
-  } = useEventModal();
+  const { openModal } = useEventModalStore();
 
   const createCharacter = useMutation(api.characters.create);
   const updateCharacter = useMutation(api.characters.update);
@@ -136,7 +130,7 @@ export default function ProjectClientPage({
             </TabsList>
             <div className="flex gap-2">
               <Button
-                onClick={() => openEventModal()}
+                onClick={() => openModal()}
                 className="gap-2"
                 size="sm"
               >
@@ -159,10 +153,6 @@ export default function ProjectClientPage({
               onEventUpdate={handleEventUpdate}
               onEventDelete={handleEventDelete}
               projectId={projectId}
-              showEventModal={showEventModal}
-              editingEvent={editingEvent}
-              onEventClick={handleEventClick}
-              closeModal={closeModal}
             />
           </TabsContent>
           <TabsContent value="spreadsheet" className="flex-1">

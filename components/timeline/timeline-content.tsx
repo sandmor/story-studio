@@ -3,6 +3,7 @@ import { Character, TimelineEvent } from "@/types/timeline";
 import { CharacterTrack } from "./character-track";
 import { TimelineRuler, TimelineRulerHeader } from "./timeline-ruler";
 import { TimelineEventGroup } from "./timeline-event-group";
+import { useEventModalStore } from "@/stores/use-event-modal-store";
 
 interface TimelineContentProps {
   characters: Character[];
@@ -17,12 +18,6 @@ interface TimelineContentProps {
   viewportRef: React.RefObject<HTMLDivElement | null>;
   rightPanelRef: React.RefObject<HTMLDivElement | null>;
   rightHeaderRef: React.RefObject<HTMLDivElement | null>;
-  onEventClick: (
-    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
-      startTime: number;
-      endTime: number;
-    }
-  ) => void;
   onHorizontalScroll: () => void;
 }
 
@@ -36,7 +31,6 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
   viewportRef,
   rightPanelRef,
   rightHeaderRef,
-  onEventClick,
   onHorizontalScroll,
 }) => {
   const visibleCharacters = characters
@@ -44,6 +38,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
     .sort((a, b) => a.order - b.order);
 
   const timeRange = viewEndTime - viewStartTime;
+  const { openModal } = useEventModalStore();
 
   return (
     <div ref={viewportRef} className="flex-1 flex flex-col overflow-hidden">
@@ -95,7 +90,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
                 pixelsPerTimeUnit={pixelsPerTimeUnit}
                 viewStartTime={viewStartTime}
                 isSelected={selectedEventId === event._id}
-                onClick={onEventClick}
+                onClick={openModal}
               />
             ))}
           </div>

@@ -62,9 +62,6 @@ export const dateToSeconds = (date: {
   year: number;
   month: number;
   day: number;
-  hour: number;
-  minute: number;
-  second: number;
 }): number => {
   let totalSeconds = 0;
 
@@ -77,9 +74,6 @@ export const dateToSeconds = (date: {
   }
 
   totalSeconds += (date.day - 1) * 24 * 60 * 60;
-  totalSeconds += date.hour * 60 * 60;
-  totalSeconds += date.minute * 60;
-  totalSeconds += date.second;
 
   return totalSeconds;
 };
