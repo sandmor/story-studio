@@ -4,18 +4,39 @@ import { EventModal } from "./event-modal";
 import { CharacterSidebar } from "./character-sidebar";
 import { TimelineContent } from "./timeline-content";
 import { useTimelineViewport } from "@/hooks/use-timeline-viewport";
-import { useEventModal } from "@/hooks/use-event-modal";
 import { useSyncScrolls } from "@/hooks/use-sync-scrolls";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface TimelineViewProps {
   characters: Character[];
-  events: TimelineEvent[];
+  events: (Omit<TimelineEvent, "startTime" | "endTime"> & {
+    startTime: number;
+    endTime: number;
+  })[];
   onCharacterUpdate: (character: Character) => void;
-  onEventUpdate: (event: TimelineEvent) => void;
+  onEventUpdate: (
+    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => void;
   onEventCreate: (event: TimelineEventInput) => void;
   onEventDelete: (eventId: string) => void;
   projectId: Id<"projects">;
+  showEventModal: boolean;
+  editingEvent:
+    | (Omit<TimelineEvent, "startTime" | "endTime"> & {
+        startTime: number;
+        endTime: number;
+      })
+    | null;
+  onEventClick: (
+    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => void;
+  closeModal: () => void;
 }
 
 export const TimelineView: React.FC<TimelineViewProps> = ({
@@ -26,17 +47,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onEventCreate,
   onEventDelete,
   projectId,
+  showEventModal,
+  editingEvent,
+  onEventClick,
+  closeModal,
 }) => {
   // Custom hooks for state management
   const { pixelsPerTimeUnit, viewStartTime, viewEndTime, viewportRef } =
     useTimelineViewport();
-
-  const {
-    showEventModal,
-    editingEvent,
-    handleEventClick,
-    closeModal,
-  } = useEventModal();
 
   // Refs for scroll synchronization
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -51,10 +69,8 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     (eventData: TimelineEventInput) => {
       if (editingEvent) {
         onEventUpdate({
+          ...(editingEvent as any), // Already has the correct shape
           ...eventData,
-          _id: editingEvent._id,
-          _creationTime: editingEvent._creationTime,
-          projectId: projectId,
         });
       } else {
         onEventCreate({ ...eventData, projectId: projectId });
@@ -94,7 +110,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           viewportRef={viewportRef}
           rightPanelRef={rightPanelRef}
           rightHeaderRef={rightHeaderRef}
-          onEventClick={handleEventClick}
+          onEventClick={onEventClick}
           onHorizontalScroll={handleHorizontalScroll}
         />
       </div>

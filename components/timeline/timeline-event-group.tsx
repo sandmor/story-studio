@@ -3,12 +3,20 @@ import { TimelineEvent, Character } from "@/types/timeline";
 import { TimelineEventComponent } from "./timeline-event-component";
 
 interface TimelineEventGroupProps {
-  event: TimelineEvent;
+  event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+    startTime: number;
+    endTime: number;
+  };
   visibleCharacters: Character[];
   pixelsPerTimeUnit: number;
   viewStartTime: number;
   isSelected: boolean;
-  onClick: (event: TimelineEvent) => void;
+  onClick: (
+    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => void;
 }
 
 const groupAdjacentNumbers = (numbers: number[]): number[][] => {

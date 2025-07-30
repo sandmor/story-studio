@@ -18,10 +18,16 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Type, Text, Clock, Palette, Users } from "lucide-react";
 import { ColorPicker, DEFAULT_COLORS } from "@/components/color-picker";
+import { DatePicker } from "@/components/date-picker";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface EventModalProps {
-  event: TimelineEvent | null;
+  event:
+    | (Omit<TimelineEvent, "startTime" | "endTime"> & {
+        startTime: number;
+        endTime: number;
+      })
+    | null;
   characters: Character[];
   onSave: (event: TimelineEventInput) => void;
   onClose: () => void;
@@ -48,7 +54,8 @@ export const EventModal: React.FC<EventModalProps> = ({
   projectId,
   isOpen,
 }) => {
-  const [formState, setFormState] = useState<Omit<TimelineEventInput, "projectId">>(DEFAULT_EVENT_STATE);
+  const [formState, setFormState] =
+    useState<Omit<TimelineEventInput, "projectId">>(DEFAULT_EVENT_STATE);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,8 +63,8 @@ export const EventModal: React.FC<EventModalProps> = ({
         setFormState({
           title: event.title,
           description: event.description,
-          startTime: event.startTime,
-          endTime: event.endTime,
+          startTime: Number(event.startTime),
+          endTime: Number(event.endTime),
           participants: event.participants,
           color: event.color,
         });
@@ -72,7 +79,7 @@ export const EventModal: React.FC<EventModalProps> = ({
 
     onSave({
       ...formState,
-      endTime: Math.max(formState.endTime, formState.startTime + 0.1),
+      endTime: Math.max(formState.endTime, formState.startTime + 1),
       projectId,
     });
   };
@@ -138,15 +145,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <Clock className="w-4 h-4 inline-block mr-2" />
                 Start Time
               </Label>
-              <Input
-                id="startTime"
-                type="number"
+              <DatePicker
                 value={formState.startTime}
-                onChange={(e) =>
-                  handleInputChange("startTime", Number(e.target.value))
-                }
-                className="mt-1"
-                step="0.1"
+                onChange={(time) => handleInputChange("startTime", time)}
               />
             </div>
             <div className="space-y-2">
@@ -154,16 +155,9 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <Clock className="w-4 h-4 inline-block mr-2" />
                 End Time
               </Label>
-              <Input
-                id="endTime"
-                type="number"
+              <DatePicker
                 value={formState.endTime}
-                onChange={(e) =>
-                  handleInputChange("endTime", Number(e.target.value))
-                }
-                className="mt-1"
-                step="0.1"
-                min={formState.startTime + 0.1}
+                onChange={(time) => handleInputChange("endTime", time)}
               />
             </div>
           </div>

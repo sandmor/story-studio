@@ -32,10 +32,20 @@ export default function ProjectClientPage({
   const projectId = params.projectId as Id<"projects">;
 
   const characters = usePreloadedQuery(preloadedCharacters) || [];
-  const events = usePreloadedQuery(preloadedEvents) || [];
+  const events = (usePreloadedQuery(preloadedEvents) || []).map((e) => ({
+    ...e,
+    startTime: Number(e.startTime),
+    endTime: Number(e.endTime),
+  }));
 
   const { view, setView } = useViewStore();
-  const { handleCreateEvent: openEventModal } = useEventModal();
+  const {
+    showEventModal,
+    editingEvent,
+    handleEventClick,
+    handleCreateEvent: openEventModal,
+    closeModal,
+  } = useEventModal();
 
   const createCharacter = useMutation(api.characters.create);
   const updateCharacter = useMutation(api.characters.update);
@@ -82,7 +92,12 @@ export default function ProjectClientPage({
     });
   };
 
-  const handleEventUpdate = (updatedEvent: TimelineEvent) => {
+  const handleEventUpdate = (
+    updatedEvent: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => {
     const { _id, _creationTime, projectId, ...rest } = updatedEvent;
     updateEvent({ id: _id, ...rest }).then(() => {
       toast.success(`Event "${updatedEvent.title}" updated!`);
@@ -144,6 +159,10 @@ export default function ProjectClientPage({
               onEventUpdate={handleEventUpdate}
               onEventDelete={handleEventDelete}
               projectId={projectId}
+              showEventModal={showEventModal}
+              editingEvent={editingEvent}
+              onEventClick={handleEventClick}
+              closeModal={closeModal}
             />
           </TabsContent>
           <TabsContent value="spreadsheet" className="flex-1">

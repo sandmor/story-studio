@@ -17,9 +17,17 @@ import { ArrowUp, ArrowDown, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SpreadsheetViewProps {
-  events: TimelineEvent[];
+  events: (Omit<TimelineEvent, "startTime" | "endTime"> & {
+    startTime: number;
+    endTime: number;
+  })[];
   characters: Character[];
-  onEventUpdate: (event: TimelineEvent) => void;
+  onEventUpdate: (
+    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => void;
 }
 
 type SortableKey = keyof TimelineEvent | "duration";
@@ -42,9 +50,11 @@ export const SpreadsheetView: React.FC<SpreadsheetViewProps> = ({
     const eventToUpdate = events.find((e) => e._id === eventId);
     if (eventToUpdate) {
       const updatedValue =
-        typeof eventToUpdate[field] === "number" ? Number(value) : value;
+        field === "startTime" || field === "endTime"
+          ? Number(value)
+          : value;
       const updatedEvent = { ...eventToUpdate, [field]: updatedValue };
-      onEventUpdate(updatedEvent);
+      onEventUpdate(updatedEvent as any);
     }
   };
 

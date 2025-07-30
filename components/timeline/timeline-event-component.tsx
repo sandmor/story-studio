@@ -3,7 +3,10 @@ import { TimelineEvent } from "@/types/timeline";
 import { cn } from "@/lib/utils";
 
 interface TimelineEventComponentProps {
-  event: TimelineEvent;
+  event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+    startTime: number;
+    endTime: number;
+  };
   pixelsPerTimeUnit: number;
   viewStartTime: number;
   isSelected: boolean;

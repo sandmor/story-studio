@@ -35,7 +35,11 @@ export const create = mutation({
       throw new Error("Not authenticated");
     }
 
-    const eventId = await ctx.db.insert("timeline_events", args);
+    const eventId = await ctx.db.insert("timeline_events", {
+      ...args,
+      startTime: BigInt(args.startTime),
+      endTime: BigInt(args.endTime),
+    });
     return eventId;
   },
 });
@@ -55,7 +59,18 @@ export const update = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
-    await ctx.db.patch(id, rest);
+
+    const { startTime, endTime, ...remainingRest } = rest;
+    const patchData: Partial<any> = { ...remainingRest };
+
+    if (startTime !== undefined) {
+      patchData.startTime = BigInt(startTime);
+    }
+    if (endTime !== undefined) {
+      patchData.endTime = BigInt(endTime);
+    }
+
+    await ctx.db.patch(id, patchData);
   },
 });
 

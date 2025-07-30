@@ -6,7 +6,10 @@ import { TimelineEventGroup } from "./timeline-event-group";
 
 interface TimelineContentProps {
   characters: Character[];
-  events: TimelineEvent[];
+  events: (Omit<TimelineEvent, "startTime" | "endTime"> & {
+    startTime: number;
+    endTime: number;
+  })[];
   pixelsPerTimeUnit: number;
   viewStartTime: number;
   viewEndTime: number;
@@ -14,7 +17,12 @@ interface TimelineContentProps {
   viewportRef: React.RefObject<HTMLDivElement | null>;
   rightPanelRef: React.RefObject<HTMLDivElement | null>;
   rightHeaderRef: React.RefObject<HTMLDivElement | null>;
-  onEventClick: (event: TimelineEvent) => void;
+  onEventClick: (
+    event: Omit<TimelineEvent, "startTime" | "endTime"> & {
+      startTime: number;
+      endTime: number;
+    }
+  ) => void;
   onHorizontalScroll: () => void;
 }
 

@@ -25,8 +25,8 @@ export default defineSchema({
   timeline_events: defineTable({
     title: v.string(),
     description: v.string(),
-    startTime: v.number(),
-    endTime: v.number(),
+    startTime: v.int64(),
+    endTime: v.int64(),
     participants: v.array(v.id("characters")),
     color: v.string(),
     projectId: v.id("projects"),

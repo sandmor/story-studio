@@ -9,7 +9,14 @@ export type TimelineEventId = Id<"timeline_events">;
 
 // Clean input types for creating new entities (without Convex metadata)
 export type CharacterInput = Omit<Character, "_id" | "_creationTime" | "projectId"> & { projectId?: Id<"projects"> };
-export type TimelineEventInput = Omit<TimelineEvent, "_id" | "_creationTime" | "projectId"> & { projectId?: Id<"projects"> };
+export type TimelineEventInput = Omit<
+  TimelineEvent,
+  "_id" | "_creationTime" | "projectId" | "startTime" | "endTime"
+> & {
+  projectId?: Id<"projects">;
+  startTime: number;
+  endTime: number;
+};
 
 // State management types
 export interface TimelineState {
