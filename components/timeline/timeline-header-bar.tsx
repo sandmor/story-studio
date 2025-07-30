@@ -1,13 +1,17 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Settings } from "lucide-react";
+import Link from "next/link";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface TimelineHeaderBarProps {
   onCreateEvent: () => void;
+  projectId: Id<"projects">;
 }
 
 export const TimelineHeaderBar: React.FC<TimelineHeaderBarProps> = ({
   onCreateEvent,
+  projectId,
 }) => {
   return (
     <div className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-20">
@@ -20,9 +24,11 @@ export const TimelineHeaderBar: React.FC<TimelineHeaderBarProps> = ({
             <Plus className="w-4 h-4" />
             Add Event
           </Button>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
+          <Link href={`/project/${projectId}/settings`}>
+            <Button variant="outline" size="sm">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

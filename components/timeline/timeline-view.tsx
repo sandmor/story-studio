@@ -83,7 +83,10 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   return (
     <div className="h-full flex flex-col bg-gradient-to-b from-background to-secondary/20">
       {/* Timeline Header */}
-      <TimelineHeaderBar onCreateEvent={handleCreateEvent} />
+      <TimelineHeaderBar
+        onCreateEvent={handleCreateEvent}
+        projectId={projectId}
+      />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Character Sidebar */}
