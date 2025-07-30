@@ -2,12 +2,10 @@ import { useState, useCallback } from "react";
 import { TimelineEvent } from "@/types/timeline";
 
 export const useEventModal = () => {
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
 
   const handleEventClick = useCallback((event: TimelineEvent) => {
-    setSelectedEventId(event._id);
     setEditingEvent(event);
     setShowEventModal(true);
   }, []);
@@ -19,12 +17,9 @@ export const useEventModal = () => {
 
   const closeModal = useCallback(() => {
     setShowEventModal(false);
-    setEditingEvent(null);
-    setSelectedEventId(null);
   }, []);
 
   return {
-    selectedEventId,
     showEventModal,
     editingEvent,
     handleEventClick,

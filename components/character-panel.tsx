@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Character, CharacterInput } from "@/types/timeline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,11 @@ interface CharacterPanelProps {
   onCharacterReorder: (characters: Character[]) => void;
 }
 
+const DEFAULT_CHARACTER_STATE = {
+  name: "",
+  color: DEFAULT_COLORS[2],
+};
+
 export const CharacterPanel: React.FC<CharacterPanelProps> = ({
   characters,
   onCharacterCreate,
@@ -27,49 +32,41 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
   onCharacterDelete,
   onCharacterReorder,
 }) => {
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
     null
   );
-  const [newCharacterName, setNewCharacterName] = useState("");
-  const [newCharacterColor, setNewCharacterColor] = useState(DEFAULT_COLORS[2]);
+  const [formState, setFormState] = useState(DEFAULT_CHARACTER_STATE);
 
-  const handleCreateCharacter = () => {
-    if (!newCharacterName.trim()) return;
-
-    const maxOrder = Math.max(0, ...characters.map((c) => c.order));
-    onCharacterCreate({
-      name: newCharacterName.trim(),
-      color: newCharacterColor,
-      visible: true,
-      order: maxOrder + 1,
-    });
-
-    setNewCharacterName("");
-    setNewCharacterColor(DEFAULT_COLORS[2]);
-    setShowCreateModal(false);
-  };
-
-  const handleEditCharacter = (character: Character) => {
+  const handleOpenModal = (character: Character | null) => {
     setEditingCharacter(character);
-    setNewCharacterName(character.name);
-    setNewCharacterColor(character.color);
-    setShowCreateModal(true);
+    if (character) {
+      setFormState({ name: character.name, color: character.color });
+    } else {
+      setFormState(DEFAULT_CHARACTER_STATE);
+    }
+    setIsModalOpen(true);
   };
 
-  const handleUpdateCharacter = () => {
-    if (!editingCharacter || !newCharacterName.trim()) return;
+  const handleFormSubmit = () => {
+    if (!formState.name.trim()) return;
 
-    onCharacterUpdate({
-      ...editingCharacter,
-      name: newCharacterName.trim(),
-      color: newCharacterColor,
-    });
-
-    setEditingCharacter(null);
-    setNewCharacterName("");
-    setNewCharacterColor(DEFAULT_COLORS[2]);
-    setShowCreateModal(false);
+    if (editingCharacter) {
+      onCharacterUpdate({
+        ...editingCharacter,
+        name: formState.name.trim(),
+        color: formState.color,
+      });
+    } else {
+      const maxOrder = Math.max(0, ...characters.map((c) => c.order));
+      onCharacterCreate({
+        name: formState.name.trim(),
+        color: formState.color,
+        visible: true,
+        order: maxOrder + 1,
+      });
+    }
+    setIsModalOpen(false);
   };
 
   const toggleCharacterVisibility = (character: Character) => {
@@ -87,15 +84,7 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Characters</h3>
-          <Button
-            size="sm"
-            onClick={() => {
-              setEditingCharacter(null);
-              setNewCharacterName("");
-              setNewCharacterColor(DEFAULT_COLORS[2]);
-              setShowCreateModal(true);
-            }}
-          >
+          <Button size="sm" onClick={() => handleOpenModal(null)}>
             <Plus className="w-4 h-4 mr-1" />
             Add
           </Button>
@@ -140,7 +129,7 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => handleEditCharacter(character)}
+                  onClick={() => handleOpenModal(character)}
                   className="w-8 h-8 p-0"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -170,15 +159,7 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
       </div>
 
       {/* Create/Edit Character Modal */}
-      <Dialog
-        open={showCreateModal}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) {
-            setEditingCharacter(null);
-          }
-          setShowCreateModal(isOpen);
-        }}
-      >
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
@@ -191,8 +172,10 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
               <Label htmlFor="characterName">Name</Label>
               <Input
                 id="characterName"
-                value={newCharacterName}
-                onChange={(e) => setNewCharacterName(e.target.value)}
+                value={formState.name}
+                onChange={(e) =>
+                  setFormState({ ...formState, name: e.target.value })
+                }
                 placeholder="e.g., Sir Reginald"
                 className="mt-1"
               />
@@ -202,27 +185,20 @@ export const CharacterPanel: React.FC<CharacterPanelProps> = ({
               <Label htmlFor="characterColor">Color</Label>
               <div className="mt-1">
                 <ColorPicker
-                  value={newCharacterColor}
-                  onChange={setNewCharacterColor}
+                  value={formState.color}
+                  onChange={(color) => setFormState({ ...formState, color })}
                 />
               </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowCreateModal(false);
-              }}
-            >
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              onClick={
-                editingCharacter ? handleUpdateCharacter : handleCreateCharacter
-              }
-              disabled={!newCharacterName.trim()}
+              onClick={handleFormSubmit}
+              disabled={!formState.name.trim()}
             >
               {editingCharacter ? "Update" : "Create"}
             </Button>

@@ -27,7 +27,17 @@ interface EventModalProps {
   onClose: () => void;
   onDelete?: () => void;
   projectId: Id<"projects">;
+  isOpen: boolean;
 }
+
+const DEFAULT_EVENT_STATE = {
+  title: "",
+  description: "",
+  startTime: 0,
+  endTime: 1,
+  participants: [],
+  color: DEFAULT_COLORS[2],
+};
 
 export const EventModal: React.FC<EventModalProps> = ({
   event,
@@ -36,60 +46,57 @@ export const EventModal: React.FC<EventModalProps> = ({
   onClose,
   onDelete,
   projectId,
+  isOpen,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(1);
-  const [selectedCharacterIds, setSelectedCharacterIds] = useState<
-    CharacterId[]
-  >([]);
-  const [color, setColor] = useState(DEFAULT_COLORS[2]);
+  const [formState, setFormState] = useState<Omit<TimelineEventInput, "projectId">>(DEFAULT_EVENT_STATE);
 
   useEffect(() => {
-    if (event) {
-      setTitle(event.title);
-      setDescription(event.description || "");
-      setStartTime(event.startTime);
-      setEndTime(event.endTime);
-      setSelectedCharacterIds(event.participants);
-      setColor(event.color);
-    } else {
-      setTitle("");
-      setDescription("");
-      setStartTime(0);
-      setEndTime(1);
-      setSelectedCharacterIds([]);
-      setColor(DEFAULT_COLORS[2]);
+    if (isOpen) {
+      if (event) {
+        setFormState({
+          title: event.title,
+          description: event.description,
+          startTime: event.startTime,
+          endTime: event.endTime,
+          participants: event.participants,
+          color: event.color,
+        });
+      } else {
+        setFormState(DEFAULT_EVENT_STATE);
+      }
     }
-  }, [event]);
+  }, [isOpen, event]);
 
   const handleSave = () => {
-    if (!title.trim() || selectedCharacterIds.length === 0) return;
+    if (!formState.title.trim() || formState.participants.length === 0) return;
 
     onSave({
-      title: title.trim(),
-      description: description.trim(),
-      startTime,
-      endTime: Math.max(endTime, startTime + 0.1),
-      participants: selectedCharacterIds,
-      color: color,
+      ...formState,
+      endTime: Math.max(formState.endTime, formState.startTime + 0.1),
       projectId,
     });
   };
 
   const handleCharacterToggle = (characterId: CharacterId) => {
-    setSelectedCharacterIds((prev) =>
-      prev.includes(characterId)
-        ? prev.filter((id) => id !== characterId)
-        : [...prev, characterId]
-    );
+    setFormState((prev) => ({
+      ...prev,
+      participants: prev.participants.includes(characterId)
+        ? prev.participants.filter((id) => id !== characterId)
+        : [...prev.participants, characterId],
+    }));
   };
 
-  const isValid = title.trim() && selectedCharacterIds.length > 0;
+  const handleInputChange = (
+    field: keyof typeof formState,
+    value: string | number
+  ) => {
+    setFormState((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const isValid = formState.title.trim() && formState.participants.length > 0;
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{event ? "Edit Event" : "Create Event"}</DialogTitle>
@@ -103,8 +110,8 @@ export const EventModal: React.FC<EventModalProps> = ({
             </Label>
             <Input
               id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formState.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
               placeholder="e.g., The Grand Coronation"
               className="mt-1"
             />
@@ -117,8 +124,8 @@ export const EventModal: React.FC<EventModalProps> = ({
             </Label>
             <Textarea
               id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formState.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
               placeholder="A brief summary of what happens in this event..."
               className="mt-1"
               rows={3}
@@ -134,8 +141,10 @@ export const EventModal: React.FC<EventModalProps> = ({
               <Input
                 id="startTime"
                 type="number"
-                value={startTime}
-                onChange={(e) => setStartTime(Number(e.target.value))}
+                value={formState.startTime}
+                onChange={(e) =>
+                  handleInputChange("startTime", Number(e.target.value))
+                }
                 className="mt-1"
                 step="0.1"
               />
@@ -148,11 +157,13 @@ export const EventModal: React.FC<EventModalProps> = ({
               <Input
                 id="endTime"
                 type="number"
-                value={endTime}
-                onChange={(e) => setEndTime(Number(e.target.value))}
+                value={formState.endTime}
+                onChange={(e) =>
+                  handleInputChange("endTime", Number(e.target.value))
+                }
                 className="mt-1"
                 step="0.1"
-                min={startTime + 0.1}
+                min={formState.startTime + 0.1}
               />
             </div>
           </div>
@@ -171,7 +182,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                   >
                     <Checkbox
                       id={`char-${character._id}`}
-                      checked={selectedCharacterIds.includes(character._id)}
+                      checked={formState.participants.includes(character._id)}
                       onCheckedChange={() =>
                         handleCharacterToggle(character._id)
                       }
@@ -197,7 +208,10 @@ export const EventModal: React.FC<EventModalProps> = ({
               <Palette className="w-4 h-4 inline-block mr-2" />
               Event Color
             </Label>
-            <ColorPicker value={color} onChange={setColor} />
+            <ColorPicker
+              value={formState.color}
+              onChange={(color) => handleInputChange("color", color)}
+            />
           </div>
         </div>
 

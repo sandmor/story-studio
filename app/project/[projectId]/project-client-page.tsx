@@ -16,6 +16,10 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
 import { useViewStore } from "@/stores/use-view-store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus, Settings } from "lucide-react";
+import Link from "next/link";
+import { useEventModal } from "@/hooks/use-event-modal";
 
 export default function ProjectClientPage({
   preloadedCharacters,
@@ -31,6 +35,7 @@ export default function ProjectClientPage({
   const events = usePreloadedQuery(preloadedEvents) || [];
 
   const { view, setView } = useViewStore();
+  const { handleCreateEvent: openEventModal } = useEventModal();
 
   const createCharacter = useMutation(api.characters.create);
   const updateCharacter = useMutation(api.characters.update);
@@ -102,11 +107,34 @@ export default function ProjectClientPage({
         onCharacterReorder={handleCharacterReorder}
       />
       <div className="flex-1 flex flex-col">
-        <Tabs value={view} onValueChange={(value) => setView(value as "timeline" | "spreadsheet")} className="h-full flex flex-col">
-          <TabsList className="mx-4 mt-4 self-start">
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            <TabsTrigger value="spreadsheet">Spreadsheet</TabsTrigger>
-          </TabsList>
+        <Tabs
+          value={view}
+          onValueChange={(value) =>
+            setView(value as "timeline" | "spreadsheet")
+          }
+          className="h-full flex flex-col"
+        >
+          <div className="flex items-center justify-between p-4 border-b">
+            <TabsList>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              <TabsTrigger value="spreadsheet">Spreadsheet</TabsTrigger>
+            </TabsList>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => openEventModal()}
+                className="gap-2"
+                size="sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Event
+              </Button>
+              <Link href={`/project/${projectId}/settings`}>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
           <TabsContent value="timeline" className="flex-1">
             <TimelineView
               characters={characters}

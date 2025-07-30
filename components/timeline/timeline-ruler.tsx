@@ -1,13 +1,13 @@
 import React from "react";
 
-interface TimelineGridProps {
+interface TimelineRulerProps {
   startTime: number;
   endTime: number;
   pixelsPerTimeUnit: number;
   characterCount: number;
 }
 
-interface TimelineHeaderProps {
+interface TimelineRulerHeaderProps {
   startTime: number;
   endTime: number;
   pixelsPerTimeUnit: number;
@@ -20,7 +20,7 @@ const formatTime = (time: number): string => {
   return Math.round(time).toString();
 };
 
-export const TimelineHeader: React.FC<TimelineHeaderProps> = ({
+export const TimelineRulerHeader: React.FC<TimelineRulerHeaderProps> = ({
   startTime,
   endTime,
   pixelsPerTimeUnit,
@@ -56,15 +56,15 @@ export const TimelineHeader: React.FC<TimelineHeaderProps> = ({
   );
 };
 
-export const TimelineGrid: React.FC<TimelineGridProps> = ({
+export const TimelineRuler: React.FC<TimelineRulerProps> = ({
   startTime,
   endTime,
   pixelsPerTimeUnit,
   characterCount,
 }) => {
   const timeRange = endTime - startTime;
-  const gridWidth = timeRange * pixelsPerTimeUnit;
-  const gridHeight = characterCount * 80; // 80 is h-20 for each track
+  const rulerWidth = timeRange * pixelsPerTimeUnit;
+  const rulerHeight = characterCount * 80; // 80 is h-20 for each track
 
   // Calculate grid intervals (adjust based on zoom level)
   const majorInterval = Math.max(1, Math.floor(timeRange / 10));
@@ -97,7 +97,7 @@ export const TimelineGrid: React.FC<TimelineGridProps> = ({
   return (
     <div
       className="absolute inset-0 pointer-events-none"
-      style={{ width: gridWidth, height: gridHeight }}
+      style={{ width: rulerWidth, height: rulerHeight }}
     >
       {/* Vertical grid lines */}
       {majorLines.map((x, i) => (

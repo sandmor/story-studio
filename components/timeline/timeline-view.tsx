@@ -1,7 +1,6 @@
 import React, { useRef, useCallback } from "react";
 import { Character, TimelineEvent, TimelineEventInput } from "@/types/timeline";
 import { EventModal } from "./event-modal";
-import { TimelineHeaderBar } from "./timeline-header-bar";
 import { CharacterSidebar } from "./character-sidebar";
 import { TimelineContent } from "./timeline-content";
 import { useTimelineViewport } from "@/hooks/use-timeline-viewport";
@@ -33,11 +32,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     useTimelineViewport();
 
   const {
-    selectedEventId,
     showEventModal,
     editingEvent,
     handleEventClick,
-    handleCreateEvent,
     closeModal,
   } = useEventModal();
 
@@ -82,12 +79,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-b from-background to-secondary/20">
-      {/* Timeline Header */}
-      <TimelineHeaderBar
-        onCreateEvent={handleCreateEvent}
-        projectId={projectId}
-      />
-
       <div className="flex-1 flex overflow-hidden">
         {/* Character Sidebar */}
         <CharacterSidebar characters={characters} leftPanelRef={leftPanelRef} />
@@ -99,7 +90,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           pixelsPerTimeUnit={pixelsPerTimeUnit}
           viewStartTime={viewStartTime}
           viewEndTime={viewEndTime}
-          selectedEventId={selectedEventId}
+          selectedEventId={editingEvent?._id || null}
           viewportRef={viewportRef}
           rightPanelRef={rightPanelRef}
           rightHeaderRef={rightHeaderRef}
@@ -109,16 +100,15 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
       </div>
 
       {/* Event Modal */}
-      {showEventModal && (
-        <EventModal
-          event={editingEvent}
-          characters={characters}
-          onSave={handleEventSave}
-          onClose={closeModal}
-          onDelete={editingEvent ? handleEventDelete : undefined}
-          projectId={projectId}
-        />
-      )}
+      <EventModal
+        isOpen={showEventModal}
+        event={editingEvent}
+        characters={characters}
+        onSave={handleEventSave}
+        onClose={closeModal}
+        onDelete={editingEvent ? handleEventDelete : undefined}
+        projectId={projectId}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { Character, TimelineEvent } from "@/types/timeline";
 import { CharacterTrack } from "./character-track";
-import { TimelineGrid, TimelineHeader } from "./timeline-grid";
+import { TimelineRuler, TimelineRulerHeader } from "./timeline-ruler";
 import { TimelineEventGroup } from "./timeline-event-group";
 
 interface TimelineContentProps {
@@ -43,7 +43,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
         ref={rightHeaderRef}
         className="h-16 border-b bg-muted/30 backdrop-blur-sm sticky top-0 z-10 overflow-hidden"
       >
-        <TimelineHeader
+        <TimelineRulerHeader
           startTime={viewStartTime}
           endTime={viewEndTime}
           pixelsPerTimeUnit={pixelsPerTimeUnit}
@@ -59,10 +59,11 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
           className="relative"
           style={{
             width: timeRange * pixelsPerTimeUnit,
+            minWidth: "100%",
             height: visibleCharacters.length * 80,
           }}
         >
-          <TimelineGrid
+          <TimelineRuler
             startTime={viewStartTime}
             endTime={viewEndTime}
             pixelsPerTimeUnit={pixelsPerTimeUnit}
