@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
 import { ChevronsUpDown } from "lucide-react";
 import chroma from "chroma-js";
 
@@ -43,35 +43,16 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   value,
   onChange,
 }) => {
-  const [hsv, setHsv] = useState(() => {
+  const [internalHex, setInternalHex] = useState(value);
+
+  const hsv = useMemo(() => {
     const hsvColor = chroma(value).hsv();
-    if (isNaN(hsvColor[0])) {
-      hsvColor[0] = 0;
-    }
+    if (isNaN(hsvColor[0])) hsvColor[0] = 0;
     return hsvColor;
-  });
-  const svPickerRef = useRef<HTMLDivElement>(null);
-
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
-  const isDraggingRef = useRef(false);
-
-  useEffect(() => {
-    const newHex = chroma.hsv(hsv[0], hsv[1], hsv[2]).hex();
-    if (newHex.toUpperCase() !== value.toUpperCase()) {
-      onChangeRef.current(newHex);
-    }
-  }, [hsv, value]);
-
-  useEffect(() => {
-    if (!isDraggingRef.current) {
-      const newHsv = chroma(value).hsv();
-      if (isNaN(newHsv[0])) {
-        newHsv[0] = hsv[0];
-      }
-      setHsv(newHsv);
-    }
   }, [value]);
+
+  const svPickerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
 
   const handleSvChange = useCallback(
     (e: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
@@ -79,43 +60,34 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       const rect = svPickerRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
       const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-
       const newSaturation = x / rect.width;
       const newValue = 1 - y / rect.height;
-
-      setHsv((prevHsv) => [prevHsv[0], newSaturation, newValue]);
+      onChange(chroma.hsv(hsv[0], newSaturation, newValue).hex());
     },
-    []
+    [hsv, onChange]
   );
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        handleSvChange(e);
-      }
-    };
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [handleSvChange]);
 
   const handleHueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newHue = parseFloat(e.target.value);
-    setHsv((prevHsv) => [newHue, prevHsv[1], prevHsv[2]]);
+    onChange(chroma.hsv(newHue, hsv[1], hsv[2]).hex());
   };
 
   const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newHex = e.target.value;
+    setInternalHex(newHex);
     if (chroma.valid(newHex)) {
       onChange(newHex);
     }
+  };
+
+  const handleHexBlur = () => {
+    if (!chroma.valid(internalHex)) {
+      setInternalHex(value);
+    }
+  };
+
+  const handleDefaultColorClick = (color: string) => {
+    onChange(color);
   };
 
   const hueGradient =
@@ -150,6 +122,20 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           onMouseDown={(e) => {
             isDraggingRef.current = true;
             handleSvChange(e);
+            
+            const handleMouseMove = (e: MouseEvent) => {
+              if (isDraggingRef.current) {
+                handleSvChange(e);
+              }
+            };
+            const handleMouseUp = () => {
+              isDraggingRef.current = false;
+              window.removeEventListener("mousemove", handleMouseMove);
+              window.removeEventListener("mouseup", handleMouseUp);
+            };
+        
+            window.addEventListener("mousemove", handleMouseMove);
+            window.addEventListener("mouseup", handleMouseUp);
           }}
         >
           <div
@@ -173,8 +159,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             style={{ background: hueGradient, borderRadius: "9999px" }}
           />
           <Input
-            value={value.toUpperCase()}
+            value={internalHex.toUpperCase()}
             onChange={handleHexChange}
+            onBlur={handleHexBlur}
             className="w-full text-center text-lg font-mono tracking-widest"
           />
         </div>
@@ -194,7 +181,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     : "hover:ring-2 hover:ring-primary"
                 )}
                 style={{ backgroundColor: color }}
-                onClick={() => onChange(color)}
+                onClick={() => handleDefaultColorClick(color)}
               />
             ))}
           </div>
