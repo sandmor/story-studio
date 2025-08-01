@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 
 interface UseTimelineViewportProps {
-  initialPixelsPerTimeUnit?: number;
+  initialPixelsPerSecond?: number;
   initialViewStartTime?: number;
 }
 
 export const useTimelineViewport = ({
-  initialPixelsPerTimeUnit = 100,
+  initialPixelsPerSecond = 100 / 60 / 60 / 24 / 30,
   initialViewStartTime = 0,
 }: UseTimelineViewportProps = {}) => {
-  const [pixelsPerTimeUnit, setPixelsPerTimeUnit] = useState(
-    initialPixelsPerTimeUnit
+  const [pixelsPerSecond, setPixelsPerSecond] = useState(
+    initialPixelsPerSecond
   );
   const [viewStartTime, setViewStartTime] = useState(initialViewStartTime);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -18,8 +18,8 @@ export const useTimelineViewport = ({
   const viewportRef = useRef<HTMLDivElement | null>(null);
 
   const viewEndTime = useMemo(() => {
-    return viewStartTime + viewportWidth / pixelsPerTimeUnit;
-  }, [viewStartTime, viewportWidth, pixelsPerTimeUnit]);
+    return viewStartTime + viewportWidth / pixelsPerSecond;
+  }, [viewStartTime, viewportWidth, pixelsPerSecond]);
 
   useEffect(() => {
     const element = viewportRef.current;
@@ -41,8 +41,8 @@ export const useTimelineViewport = ({
   }, []);
 
   return {
-    pixelsPerTimeUnit,
-    setPixelsPerTimeUnit,
+    pixelsPerSecond,
+    setPixelsPerSecond,
     viewStartTime,
     setViewStartTime,
     viewportWidth,

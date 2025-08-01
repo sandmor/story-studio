@@ -36,7 +36,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   projectId,
 }) => {
   // Custom hooks for state management
-  const { pixelsPerTimeUnit, viewStartTime, viewEndTime, viewportRef } =
+  const { pixelsPerSecond, viewStartTime, viewEndTime, viewportRef } =
     useTimelineViewport();
 
   const { isOpen, editingEvent, openModal, closeModal } = useEventModalStore();
@@ -88,7 +88,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         <TimelineContent
           characters={characters}
           events={events}
-          pixelsPerTimeUnit={pixelsPerTimeUnit}
+          pixelsPerSecond={pixelsPerSecond}
           viewStartTime={viewStartTime}
           viewEndTime={viewEndTime}
           selectedEventId={editingEvent?._id || null}

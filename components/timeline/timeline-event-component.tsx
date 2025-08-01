@@ -7,7 +7,7 @@ interface TimelineEventComponentProps {
     startTime: number;
     endTime: number;
   };
-  pixelsPerTimeUnit: number;
+  pixelsPerSecond: number;
   viewStartTime: number;
   isSelected: boolean;
   onClick: () => void;
@@ -18,7 +18,7 @@ interface TimelineEventComponentProps {
 
 export const TimelineEventComponent: React.FC<TimelineEventComponentProps> = ({
   event,
-  pixelsPerTimeUnit,
+  pixelsPerSecond,
   viewStartTime,
   isSelected,
   onClick,
@@ -27,8 +27,8 @@ export const TimelineEventComponent: React.FC<TimelineEventComponentProps> = ({
   isMultiCharacter = false,
 }) => {
   const eventDuration = event.endTime - event.startTime;
-  const eventWidth = eventDuration * pixelsPerTimeUnit;
-  const eventLeft = (event.startTime - viewStartTime) * pixelsPerTimeUnit;
+  const eventWidth = eventDuration * pixelsPerSecond;
+  const eventLeft = (event.startTime - viewStartTime) * pixelsPerSecond;
 
   const eventColor = event.color;
 

@@ -8,7 +8,7 @@ interface TimelineEventGroupProps {
     endTime: number;
   };
   visibleCharacters: Character[];
-  pixelsPerTimeUnit: number;
+  pixelsPerSecond: number;
   viewStartTime: number;
   isSelected: boolean;
   onClick: (
@@ -44,7 +44,7 @@ const groupAdjacentNumbers = (numbers: number[]): number[][] => {
 export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
   event,
   visibleCharacters,
-  pixelsPerTimeUnit,
+  pixelsPerSecond,
   viewStartTime,
   isSelected,
   onClick,
@@ -77,7 +77,7 @@ export const TimelineEventGroup: React.FC<TimelineEventGroupProps> = ({
           <TimelineEventComponent
             key={`${event._id}-${index}`}
             event={event}
-            pixelsPerTimeUnit={pixelsPerTimeUnit}
+            pixelsPerSecond={pixelsPerSecond}
             viewStartTime={viewStartTime}
             isSelected={isSelected}
             onClick={() => onClick(event)}

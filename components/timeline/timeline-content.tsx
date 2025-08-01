@@ -11,7 +11,7 @@ interface TimelineContentProps {
     startTime: number;
     endTime: number;
   })[];
-  pixelsPerTimeUnit: number;
+  pixelsPerSecond: number;
   viewStartTime: number;
   viewEndTime: number;
   selectedEventId: string | null;
@@ -24,7 +24,7 @@ interface TimelineContentProps {
 export const TimelineContent: React.FC<TimelineContentProps> = ({
   characters,
   events,
-  pixelsPerTimeUnit,
+  pixelsPerSecond,
   viewStartTime,
   viewEndTime,
   selectedEventId,
@@ -49,7 +49,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
         <TimelineRulerHeader
           startTime={viewStartTime}
           endTime={viewEndTime}
-          pixelsPerTimeUnit={pixelsPerTimeUnit}
+          pixelsPerSecond={pixelsPerSecond}
         />
       </div>
 
@@ -61,7 +61,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
         <div
           className="relative"
           style={{
-            width: timeRange * pixelsPerTimeUnit,
+            width: timeRange * pixelsPerSecond,
             minWidth: "100%",
             height: visibleCharacters.length * 80,
           }}
@@ -69,7 +69,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
           <TimelineRuler
             startTime={viewStartTime}
             endTime={viewEndTime}
-            pixelsPerTimeUnit={pixelsPerTimeUnit}
+            pixelsPerSecond={pixelsPerSecond}
             characterCount={visibleCharacters.length}
           />
 
@@ -87,7 +87,7 @@ export const TimelineContent: React.FC<TimelineContentProps> = ({
                 key={event._id}
                 event={event}
                 visibleCharacters={visibleCharacters}
-                pixelsPerTimeUnit={pixelsPerTimeUnit}
+                pixelsPerSecond={pixelsPerSecond}
                 viewStartTime={viewStartTime}
                 isSelected={selectedEventId === event._id}
                 onClick={openModal}

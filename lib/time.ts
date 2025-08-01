@@ -1,4 +1,10 @@
 
+export const SECONDS_PER_MINUTE = 60;
+export const SECONDS_PER_HOUR = SECONDS_PER_MINUTE * 60;
+export const SECONDS_PER_DAY = SECONDS_PER_HOUR * 24;
+export const SECONDS_PER_YEAR = SECONDS_PER_DAY * 365;
+export const SECONDS_PER_LEAP_YEAR = SECONDS_PER_DAY * 366;
+
 export const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 export const DAYS_IN_LEAP_MONTH = [
   31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
