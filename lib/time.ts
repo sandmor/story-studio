@@ -62,6 +62,9 @@ export const dateToSeconds = (date: {
   year: number;
   month: number;
   day: number;
+  hour?: number;
+  minute?: number;
+  second?: number;
 }): number => {
   let totalSeconds = 0;
 
@@ -74,6 +77,19 @@ export const dateToSeconds = (date: {
   }
 
   totalSeconds += (date.day - 1) * 24 * 60 * 60;
+  totalSeconds += (date.hour || 0) * 60 * 60;
+  totalSeconds += (date.minute || 0) * 60;
+  totalSeconds += date.second || 0;
 
   return totalSeconds;
+};
+
+export const getDayOfWeek = (
+  year: number,
+  month: number,
+  day: number
+): number => {
+  const totalDays = dateToSeconds({ year, month, day }) / (24 * 60 * 60) + 1;
+  // Assuming 0000-01-01 is Saturday (6). Sunday is 0.
+  return (totalDays + 5) % 7;
 };
